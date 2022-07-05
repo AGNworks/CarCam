@@ -3,9 +3,10 @@
 <head>
     <meta charset="utf-8">
 
-    <title>Webcam display</title>
+    <title>CarCam</title>
 
     <link rel="stylesheet" href="{{url_for('static',filename='css/mainpage.css')}}" >
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico')}}">
 
      <!--<link rel="stylesheet" href="styles.css">-->
 
@@ -13,37 +14,42 @@
  
 <body>
     <div id="container">
-        <video autoplay="true" id="videoElement">
-        </video>
+        <div id="pictures">
+            <table>
+                <td>
+                    <img src="{{ url_for('video_feed') }}" style="float:left; width:100%; max-width: 700px; max-height:600px; border-radius:10px"></img>
+                </td>
+                <td>
+                    <img src="{{ url_for('video_feed') }}" style="float:left; width:100%; max-width: 700px; max-height:600px; border-radius:10px"></img>
+                </td>
+            
+            </table>
+        </div>
         <div id="control_buttons">
             <table>
                 <tr>
-                  <td><button onclick="test_ajax(this)">LF</button></td>
-                  <td><button onclick="test_ajax(this)">F</button></td>
-                  <td><button onclick="test_ajax(this)">RF</button></td>
+                  <td> </td>
+                  <td><button onclick="cmd_ajax(this)">F</button></td>
+                  <td> </td>
                 </tr>
                 <tr>
-                  <td><button onclick="test_ajax(this)">L</button></td>
-                  <td>O</td>
-                  <td><button onclick="test_ajax(this)">R</button></td>
+                  <td><button onclick="cmd_ajax(this)">L</button></td>
+                  <td><button onclick="cmd_ajax(this)">B</button></td>
+                  <td><button onclick="cmd_ajax(this)">R</button></td>
                 </tr>
                 <tr>
-                  <td><button onclick="test_ajax(this)">LB</button></td>
-                  <td><button onclick="test_ajax(this)">B</button></td>
-                  <td><button onclick="test_ajax(this)">RB</button></td>
+                  <td><button onclick="cmd_ajax(this)">S</button></td>
+                  <td> </td>
+                  <td><button onclick="cmd_ajax(this)">C</button></td>
                 </tr>
               </table>
         </div>
     </div>
-    
-    
-    
 </body>
 
 <script type=text/javascript> 
-    function test_ajax(id){
+    function cmd_ajax(id){
         x = id.innerHTML;
-        console.log(x);
         $.ajax({
             type: "POST",
             url: "/process",
@@ -55,21 +61,6 @@
 
 </script>
 
-<script>                                                          
-    var video = document.querySelector("#videoElement");
-
-    if (navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then(function (stream) {
-        video.srcObject = stream;
-        console.log("Video is working");
-        })
-        .catch(function (err0r) {
-        console.log("Something went wrong!");
-        });
-    }
-</script>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="/static/js/jquery-3.6.0.js"></script>
 
 </html>
