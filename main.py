@@ -5,6 +5,7 @@ from subprocess import check_output
 import RPi.GPIO as GPIO
 import time
 import os
+import numpy as np
 
 mode = GPIO.getmode()
 GPIO.setmode(GPIO.BCM)
@@ -97,7 +98,9 @@ print(type(ip_adr))
 
 if ip_adr is not None:
     app = Flask(__name__)
-
+    
+    simg = np.empty(shape = (240,320,3))
+    
     def gen_frames():
         camera = cv2.VideoCapture(0)
         while True:
@@ -107,12 +110,22 @@ if ip_adr is not None:
             else:
                 w = int(frame.shape[1]/2)
                 h = int(frame.shape[0]/2)
+                global simg
                 simg = cv2.resize(frame, (w,h))
                 grayframe = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 ret, buffer = cv2.imencode('.jpg', simg)
                 frame = buffer.tobytes()
                 yield (b'--frame\r\n'
                        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+    
+    def gen_seq():
+        while True:
+            #grayframe = cv2.cvtColor(simg, cv2.COLOR_BGR2GRAY)
+            imginv = cv2.bitwise_not(simg)
+            ret, buffer = cv2.imencode('.jpg', imginv)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
                 
 
     @app.route("/")
@@ -123,6 +136,10 @@ if ip_adr is not None:
     @app.route('/video_feed')
     def video_feed():
         return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    
+    @app.route('/seq_feed')
+    def seq_feed():
+        return Response(gen_seq(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
     @app.route('/process', methods=["GET", "POST"])
     def background_process_test():
