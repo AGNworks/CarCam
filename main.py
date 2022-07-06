@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, make_response, redirect, request, url_for, jsonify
+from flask import Flask, render_template, Response, make_response, redirect, request, url_for, jsonify, send_file
 import cv2
 from subprocess import check_output
 
@@ -22,6 +22,7 @@ speed = 25 #Starting PWM % value for wheels
 sleepturn = 0.3
 
 imgcount = 0
+imgname = "rec.jpg"
 
 Apin1 = 15
 Apin2 = 14
@@ -147,6 +148,11 @@ if ip_adr is not None:
     @app.route('/seq_feed')
     def seq_feed():
         return Response(gen_seq(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    
+    @app.route('/status')
+    def status():
+        global imgname
+        return send_file('static/{}'.format(imgname), mimetype='image/gif')
 
     @app.route('/process', methods=["GET", "POST"])
     def background_process_test():
