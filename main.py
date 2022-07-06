@@ -21,6 +21,8 @@ GPIO.add_event_detect(21, GPIO.FALLING, callback=shutdownrpi, bouncetime=2000)
 speed = 25 #Starting PWM % value for wheels
 sleepturn = 0.3
 
+imgcount = 0
+
 Apin1 = 15
 Apin2 = 14
 Bpin1 = 26
@@ -81,6 +83,12 @@ def turnright():
     time.sleep(sleepturn)
     stop()
 
+def created_imgs():
+    global imgcount
+    cv2.imwrite('/home/agn/Pictures/createdimgs/{}.jpg'.format(imgcount), simg)
+    imgcount += 1
+    
+
 def check_wifi():
     wifi_ip = check_output(['hostname', '-I'])
     wifi_str = str(wifi_ip.decode())
@@ -96,10 +104,11 @@ ip_adr = check_wifi()
 print(ip_adr)
 print(type(ip_adr))
 
+img_size = (240,320)
 if ip_adr is not None:
     app = Flask(__name__)
     
-    simg = np.empty(shape = (240,320,3))
+    simg = np.empty(shape = (img_size[0],img_size[1],3))
     
     def gen_frames():
         camera = cv2.VideoCapture(0)
@@ -108,19 +117,17 @@ if ip_adr is not None:
             if not success:
                 break
             else:
-                w = int(frame.shape[1]/2)
-                h = int(frame.shape[0]/2)
+                #w = int(frame.shape[1]/2)
+                #h = int(frame.shape[0]/2)
                 global simg
-                simg = cv2.resize(frame, (w,h))
-                grayframe = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                simg = cv2.resize(frame, (img_size[1],img_size[0]))
                 ret, buffer = cv2.imencode('.jpg', simg)
                 frame = buffer.tobytes()
                 yield (b'--frame\r\n'
                        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
     
-    def gen_seq():
+    def gen_seq(): 
         while True:
-            #grayframe = cv2.cvtColor(simg, cv2.COLOR_BGR2GRAY)
             imginv = cv2.bitwise_not(simg)
             ret, buffer = cv2.imencode('.jpg', imginv)
             frame = buffer.tobytes()
@@ -163,6 +170,7 @@ if ip_adr is not None:
                 stop()
             elif data == "C" : 
                 print("recording frames turned ON/OFF")
+                created_imgs()
         return ("nothing")
 
     if __name__ == "__main__":
