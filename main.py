@@ -7,6 +7,7 @@ import time
 import os
 import numpy as np
 
+
 mode = GPIO.getmode()
 GPIO.setmode(GPIO.BCM)
 
@@ -45,6 +46,7 @@ Bp = GPIO.PWM(Ben, 1000)
 Ap.start(speed)
 Bp.start(speed)
 
+#functions to control DC motors
 def forward():
     GPIO.output(Apin1, GPIO.LOW)
     GPIO.output(Apin2, GPIO.HIGH)
@@ -84,13 +86,19 @@ def turnright():
     time.sleep(sleepturn)
     stop()
 
-def created_imgs():
-    global imgcount
-    cv2.imwrite('/home/agn/Pictures/createdimgs/{}.jpg'.format(imgcount), simg)
-    imgcount += 1
+def create_imgs():  #funciton to save frames when button is pressed
+    with open ("imgnumb.txt", "r") as numbfile:   #reading from file the current number of the frame
+        imgnumb = int(numbfile.read())
+    print(imgnumb)
+    
+    cv2.imwrite('/home/agn/Pictures/createdimgs/{}.jpg'.format(imgnumb), simg)
+    imgnumb += 1
+    
+    with open ("imgnumb.txt", "w") as numbfile: #writing to the file the current number of the frame
+        numbfile.write(str(imgnumb))
     
 
-def check_wifi():
+def check_wifi(): #function to chechk wifi connection
     wifi_ip = check_output(['hostname', '-I'])
     wifi_str = str(wifi_ip.decode())
     if len(wifi_ip) > 4:
@@ -176,7 +184,7 @@ if ip_adr is not None:
                 stop()
             elif data == "C" : 
                 print("recording frames turned ON/OFF")
-                created_imgs()
+                create_imgs()
         return ("nothing")
 
     if __name__ == "__main__":
