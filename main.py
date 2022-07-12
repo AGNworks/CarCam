@@ -24,7 +24,7 @@ speed = 25 #Starting PWM % value for wheels
 sleepturn = 0.3
 
 imgcount = 0
-imgname = "rec.jpg"
+imgname = "norec.jpg"
 rec_img = False
 
 Apin1 = 15
@@ -33,6 +33,7 @@ Bpin1 = 26
 Bpin2 = 19
 Aen = 18   #PWM pin
 Ben = 13   #PWM pin
+stateLED = 25
 
 GPIO.setup(Apin1, GPIO.OUT)
 GPIO.setup(Apin2, GPIO.OUT)
@@ -41,6 +42,8 @@ GPIO.setup(Bpin2, GPIO.OUT)
 GPIO.setup(Aen, GPIO.OUT)
 GPIO.setup(Ben, GPIO.OUT)
 
+GPIO.setup(stateLED, GPIO.OUT)
+GPIO.output(stateLED, GPIO.LOW)
 #GPIO.output(Aen, GPIO.HIGH)
 #GPIO.output(Ben, GPIO.HIGH)
 Ap = GPIO.PWM(Aen, 1000)
@@ -98,14 +101,18 @@ def create_imgs():
         try:
             #t = threading.Timer(5.0, create_frame).start()
             rec_img = True
+            imgname = "rec.jpg"
             print("ON")
+            GPIO.output(stateLED, GPIO.HIGH)
         except:
             print("can't start recording")
     elif rec_img == True:
         try:
             #t.cancel()
             rec_img = False
+            imgname = "norec.jpg"
             print("OFF")
+            GPIO.output(stateLED, GPIO.LOW)
         except:
             print("can't stop recording")
     
