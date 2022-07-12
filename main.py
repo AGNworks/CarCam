@@ -22,6 +22,7 @@ GPIO.add_event_detect(21, GPIO.FALLING, callback=shutdownrpi, bouncetime=2000)
 
 speed = 25 #Starting PWM % value for wheels
 sleepturn = 0.3
+sleeprun = 0.5
 
 imgcount = 0
 imgname = "norec.jpg"
@@ -43,7 +44,11 @@ GPIO.setup(Aen, GPIO.OUT)
 GPIO.setup(Ben, GPIO.OUT)
 
 GPIO.setup(stateLED, GPIO.OUT)
+
+GPIO.output(stateLED, GPIO.HIGH)
+time.sleep(0.5)
 GPIO.output(stateLED, GPIO.LOW)
+
 #GPIO.output(Aen, GPIO.HIGH)
 #GPIO.output(Ben, GPIO.HIGH)
 Ap = GPIO.PWM(Aen, 1000)
@@ -58,7 +63,7 @@ def forward():
     GPIO.output(Bpin1, GPIO.LOW)
     GPIO.output(Bpin2, GPIO.HIGH)
     print("MF")
-    time.sleep(sleepturn)
+    time.sleep(sleeprun)
     stop()
     
 def backward():
@@ -67,7 +72,7 @@ def backward():
     GPIO.output(Apin1, GPIO.HIGH)
     GPIO.output(Apin2, GPIO.LOW)
     print("MB")
-    time.sleep(sleepturn)
+    time.sleep(sleeprun)
     stop()
     
 def stop():
