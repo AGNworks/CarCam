@@ -21,8 +21,8 @@ def shutdownrpi(channel):
 GPIO.add_event_detect(21, GPIO.FALLING, callback=shutdownrpi, bouncetime=2000)
 
 speed = 25 #Starting PWM % value for wheels
-sleepturn = 0.3
-sleeprun = 0.5
+sleepturn = 0.4
+sleeprun = 0.6
 
 imgcount = 0
 imgname = "norec.jpg"
