@@ -4,5 +4,8 @@
 #this is needed to wait for wifi connection
 while [ "$(ifconfig wlan0 | grep inet | grep 192.168.)" = ""  ]; do sleep 1; done
 
+#change forlder to dir where your py file is
+cd DIR
+
 #this line needed to start our main.py script at boot
-sudo python /home/user/CarCam/main.py
+sudo python main.py
