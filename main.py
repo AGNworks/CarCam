@@ -28,6 +28,8 @@ imgcount = 0
 imgname = "norec.jpg"
 rec_img = False
 
+overlay = cv2.imread('static/overlay.png')
+
 Apin1 = 15
 Apin2 = 14
 Bpin1 = 26
@@ -53,8 +55,8 @@ GPIO.output(stateLED, GPIO.LOW)
 #GPIO.output(Ben, GPIO.HIGH)
 Ap = GPIO.PWM(Aen, 1000)
 Bp = GPIO.PWM(Ben, 1000)
-Ap.start(speed)
-Bp.start(speed)
+Ap.start(40)   #speed of the left side
+Bp.start(50)   #speed of the right side
 
 #functions to control DC motors
 def forward():
@@ -63,17 +65,13 @@ def forward():
     GPIO.output(Bpin1, GPIO.LOW)
     GPIO.output(Bpin2, GPIO.HIGH)
     print("MF")
-    time.sleep(sleeprun)
-    stop()
-    
+       
 def backward():
     GPIO.output(Bpin1, GPIO.HIGH)
     GPIO.output(Bpin2, GPIO.LOW)
     GPIO.output(Apin1, GPIO.HIGH)
     GPIO.output(Apin2, GPIO.LOW)
     print("MB")
-    time.sleep(sleeprun)
-    stop()
     
 def stop():
     GPIO.output(Apin1, GPIO.HIGH)
@@ -124,11 +122,13 @@ def create_imgs():
 
 def create_frame():  #function to save frames when button is pressed
     if rec_img == True:
+        time.sleep(sleeprun)  #stopping the movement of the car before creating a picture
+        stop()
         with open ("imgnumb.txt", "r") as numbfile:   #reading from file the current number of the frame
             imgnumb = int(numbfile.read())
         print(imgnumb)
         
-        cv2.imwrite('/home/agn/Pictures/createdimgs/{}.jpg'.format(imgnumb), simg)
+        cv2.imwrite('/home/agn/Pictures/createdimgs/{}.png'.format(imgnumb), simg)
         imgnumb += 1
         
         with open ("imgnumb.txt", "w") as numbfile: #writing to the file the current number of the frame
@@ -167,7 +167,8 @@ if ip_adr is not None:
                 #h = int(frame.shape[0]/2)
                 global simg
                 simg = cv2.resize(frame, (img_size[1],img_size[0]))
-                ret, buffer = cv2.imencode('.jpg', simg)
+                overlayed = cv2.addWeighted(simg, 1, overlay, 1,0)
+                ret, buffer = cv2.imencode('.jpg', overlayed)
                 frame = buffer.tobytes()
                 yield (b'--frame\r\n'
                        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
